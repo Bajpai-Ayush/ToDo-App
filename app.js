@@ -2,7 +2,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const _ = require("lodash");
-const date = require(__dirname + "/date.js");
 
 const app = express();
 
@@ -30,12 +29,11 @@ const listSchema = new mongoose.Schema({
 const List = mongoose.model("List", listSchema);
 
 app.get("/", function (req, res) {
-  const day = date.date();
   Item.find({}, function (err, foundItems) {
     if (err) {
       console.log(err);
     } else {
-      res.render("lists", { listTitle: day, newListItems: foundItems });
+      res.render("lists", { listTitle: "Today", newListItems: foundItems });
     }
   });
 });
@@ -67,12 +65,11 @@ app.get("/:customListName", function (req, res) {
 app.post("/", function (req, res) {
   const itemName = req.body.newItem;
   const listName = req.body.list;
-  const day = date.date();
 
   const item = new Item({
     name: itemName,
   });
-  if (listName === day) {
+  if (listName === "Today") {
     item.save();
     res.redirect("/");
   } else {
@@ -87,9 +84,8 @@ app.post("/", function (req, res) {
 app.post("/delete", function (req, res) {
   const checkedID = req.body.checkbox;
   const listName = req.body.listName;
-  const day = date.date();
 
-  if (listName === day) {
+  if (listName === "Today") {
     Item.findByIdAndRemove(checkedID, function (err) {
       if (err) {
         console.log(err);
